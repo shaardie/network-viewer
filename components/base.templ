@@ -1,0 +1,41 @@
+package components
+
+templ Base(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<title>Network Viewer</title>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta name="color-scheme" content="light dark"/>
+			<link
+				rel="stylesheet"
+				href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.slate.min.css"
+			/>
+			// <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+		</head>
+		<body>
+			<header class="container">
+				<nav>
+					<ul>
+						<li><strong>Network Viewer</strong></li>
+					</ul>
+					<ul>
+						<li><a href="/subnet">Subnets</a></li>
+						<li><a href="/ip">IPs</a></li>
+					</ul>
+				</nav>
+			</header>
+			<main class="container">
+				{ children... }
+			</main>
+			<footer class="container">
+				<hr/>
+				<small>
+					©2025 Network Viewer –
+					<a href="https://github.com/shaardie/network-viewer" target="_blank">GitHub</a>
+				</small>
+			</footer>
+		</body>
+	</html>
+}

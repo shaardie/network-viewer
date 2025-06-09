@@ -1,0 +1,118 @@
+package components
+
+import (
+	"fmt"
+
+	"github.com/shaardie/network-viewer/database"
+)
+
+templ SubnetBase() {
+	@Base("Subnet") {
+		<h1>Subnets</h1>
+		<nav>
+			<ul>
+				<li><a type="button" href="/subnet">List Subnets</a></li>
+				<li><a type="button" href="/subnet/create">Create new Subnets</a></li>
+			</ul>
+		</nav>
+		<section class="container">
+			{ children... }
+		</section>
+	}
+}
+
+templ SubnetListPage(subnets []database.Subnet) {
+	@SubnetBase() {
+		if len(subnets) == 0 {
+			<p>no Subnets configured</p>
+		} else {
+			<table>
+				<thead>
+					<tr>
+						<th>Subnet</th>
+						<th>Scanner enabled</th>
+						<th>Scanner Interval</th>
+						<th>Last Scan</th>
+						<th>Comment</th>
+						<th>Operations</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, subnet := range subnets {
+						<tr>
+							<td>{ subnet.Subnet }</td>
+							<th>
+								if subnet.ScannerEnabled {
+									✅
+								} else {
+									❌
+								}
+							</th>
+							<th>{ fmt.Sprintf("%v", subnet.ScannerInterval) }</th>
+							<th>{ fmt.Sprintf("%v", subnet.LastScan) }</th>
+							<td>{ subnet.Comment }</td>
+							<td>
+								<div class="grid">
+									<a href={ fmt.Sprintf("/subnet/delete/%v", subnet.ID) } class="button">Delete</a>
+								</div>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	}
+}
+
+templ SubnetCreateOrUpdatePage(err error) {
+	@SubnetBase() {
+		if err != nil {
+			<div>
+				<strong style="color: red;">{ err.Error() }</strong>
+			</div>
+		}
+		<form action="/subnet/create" method="post">
+			<fieldset>
+				<label>
+					Subnet
+					<input
+						type="text"
+						name="subnet"
+						placeholder="192.168.0.0/24"
+						required
+					/>
+				</label>
+				<label>
+					Comment
+					<input
+						type="text"
+						name="comment"
+						placeholder="Comment"
+					/>
+				</label>
+			</fieldset>
+			<fieldset>
+				<legend>Scanner</legend>
+				<label>
+					<input type="checkbox" name="enabled" checked/>
+					Activate
+				</label>
+				<div class="grid">
+					<label>
+						Hours
+						<input type="number" name="hours" value="0" min="0"/>
+					</label>
+					<label>
+						Minutes
+						<input type="number" name="minutes" value="5" min="0" max="59"/>
+					</label>
+					<label>
+						Seconds
+						<input type="number" name="seconds" value="0" min="0" max="59"/>
+					</label>
+				</div>
+			</fieldset>
+			<button type="submit">Create Subnet</button>
+		</form>
+	}
+}
