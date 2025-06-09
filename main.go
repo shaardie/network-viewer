@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/shaardie/network-viewer/SubnetScanner"
 	"github.com/shaardie/network-viewer/components"
 	"github.com/shaardie/network-viewer/database"
+	"github.com/shaardie/network-viewer/subnetscanner"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -24,7 +24,7 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 
-	scanner := SubnetScanner.New(db)
+	scanner := subnetscanner.New(db)
 	scanner.Start()
 
 	e.GET("/", func(c echo.Context) error {
