@@ -1,4 +1,4 @@
-package SubnetScanner
+package subnetscanner
 
 import (
 	"context"
