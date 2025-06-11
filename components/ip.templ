@@ -39,7 +39,6 @@ templ IPListPage(ips []database.IP) {
 						<th>Hostname</th>
 						<th>Online</th>
 						<th>RTT</th>
-						<th>Hops </th>
 						<th>Comment</th>
 						<th>Operations</th>
 					</tr>
@@ -57,7 +56,6 @@ templ IPListPage(ips []database.IP) {
 								}
 							</th>
 							<th>{ ip.RTT }</th>
-							<th>{ ip.Hops }</th>
 							<th>{ ip.Comment }</th>
 							<td>
 								<div class="grid">

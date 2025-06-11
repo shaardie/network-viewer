@@ -30,7 +30,7 @@ func (s SubnetScanner) Start() {
 			select {
 			case <-ticker.C:
 				subnets := []database.Subnet{}
-				if err := s.db.Where(&database.Subnet{Type: database.SubnetTypeIPv4, ScannerEnabled: true}).Find(&subnets).Error; err != nil {
+				if err := s.db.Where(&database.Subnet{ScannerEnabled: true}).Find(&subnets).Error; err != nil {
 					slog.Error("failed to query database for subnets to scan", "error", err)
 					continue
 				}

@@ -40,7 +40,7 @@ templ SubnetListPage(subnets []database.Subnet) {
 				<tbody>
 					for _, subnet := range subnets {
 						<tr>
-							<td>{ subnet.Subnet }</td>
+							<td>{ subnet.Subnet.String() }</td>
 							<th>
 								if subnet.ScannerEnabled {
 									✅

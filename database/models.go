@@ -1,6 +1,10 @@
 package database
 
 import (
+	"database/sql/driver"
+	"errors"
+	"fmt"
+	"net"
 	"time"
 
 	"gorm.io/gorm"
@@ -21,8 +25,7 @@ type Subnet struct {
 	gorm.Model
 	Metadata
 
-	Type   subnetType `gorm:"not null"`
-	Subnet string     `gorm:"unique,not null"`
+	Subnet IPNet `gorm:"unique,not null"`
 
 	ScannerInterval time.Duration
 	ScannerEnabled  bool
@@ -31,13 +34,33 @@ type Subnet struct {
 	IPs []IP
 }
 
+type IPNet struct {
+	*net.IPNet
+}
+
+func (ipNet *IPNet) Scan(value interface{}) error {
+	s, ok := value.(string)
+	if !ok {
+		return errors.New("wrong type")
+	}
+	_, in, err := net.ParseCIDR(s)
+	if err != nil {
+		return fmt.Errorf("unable to parse cidr, %w", err)
+	}
+	ipNet.IPNet = in
+	return nil
+}
+
+func (ipNet IPNet) Value() (driver.Value, error) {
+	return ipNet.String(), nil
+}
+
 type IP struct {
 	gorm.Model
 	Metadata
 
 	IP       string `gorm:"unique,not null"`
 	RTT      time.Duration
-	Hops     int
 	MAC      string
 	Online   bool
 	Hostname string

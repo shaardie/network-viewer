@@ -65,11 +65,6 @@ func main() {
 			component := components.SubnetCreateOrUpdatePage(err)
 			return component.Render(c.Request().Context(), c.Response().Writer)
 		}
-		t :=
-			database.SubnetTypeIPv6
-		if net.IP.To4() != nil {
-			t = database.SubnetTypeIPv4
-		}
 		scannerEnabled := false
 		if c.FormValue("enabled") == "on" {
 			scannerEnabled = true
@@ -93,8 +88,7 @@ func main() {
 		}
 
 		subnet := database.Subnet{
-			Subnet:         net.String(),
-			Type:           t,
+			Subnet:         database.IPNet{IPNet: net},
 			ScannerEnabled: scannerEnabled,
 			ScannerInterval: time.Duration(hours)*time.Hour +
 				time.Duration(minutes)*time.Minute +

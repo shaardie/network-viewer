@@ -2,7 +2,6 @@ package subnetscanner
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net"
 	"time"
@@ -14,16 +13,13 @@ import (
 const workerCount = 16
 
 func (s SubnetScanner) scanNetwork(ctx context.Context, subnet *database.Subnet) error {
-	_, ipNet, err := net.ParseCIDR(subnet.Subnet)
-	if err != nil {
-		return fmt.Errorf("unable to parse subnet %v, %w", subnet.Subnet, err)
-	}
+	ipNet := subnet.Subnet.IPNet
 
 	// start writer
 	results, writerDone := s.writer(ctx)
 
 	// start iterator
-	jobs := IPIterator(ipNet)
+	jobs := IPIterator(subnet.Subnet.IPNet)
 
 	// start workers
 	workerDone := make([]chan struct{}, workerCount)
@@ -86,7 +82,6 @@ func (s SubnetScanner) worker(ctx context.Context, id int, subnet *database.Subn
 		if r.PacketsRecv != 0 {
 			ip.Online = true
 			ip.RTT = r.AvgRtt
-			ip.Hops = pinger.TTL - int(pinger.Statistics().TTLs[0])
 
 			hostnames, _ := net.LookupAddr(ipWithMask.IP.String())
 			if len(hostnames) > 0 {
