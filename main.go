@@ -8,6 +8,7 @@ import (
 
 	"github.com/shaardie/network-viewer/components"
 	"github.com/shaardie/network-viewer/database"
+	"github.com/shaardie/network-viewer/server"
 	"github.com/shaardie/network-viewer/subnetscanner"
 
 	"github.com/labstack/echo/v4"
@@ -27,17 +28,11 @@ func main() {
 	scanner := subnetscanner.New(db)
 	scanner.Start()
 
+	s := server.New(db)
+	s.SetupRoutes(e)
+
 	e.GET("/", func(c echo.Context) error {
 		component := components.Home()
-		return component.Render(c.Request().Context(), c.Response().Writer)
-	})
-
-	e.GET("/subnet", func(c echo.Context) error {
-		subnets := []database.Subnet{}
-		if err := db.Find(&subnets).Error; err != nil {
-			return echo.ErrInternalServerError.SetInternal(err)
-		}
-		component := components.SubnetListPage(subnets)
 		return component.Render(c.Request().Context(), c.Response().Writer)
 	})
 
