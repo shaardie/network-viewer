@@ -94,21 +94,21 @@ templ SubnetCreateOrUpdatePage(err error) {
 			<fieldset>
 				<legend>Scanner</legend>
 				<label>
-					<input type="checkbox" name="enabled" checked/>
+					<input type="checkbox" name="scanner_enabled" value="true" checked/>
 					Activate
 				</label>
 				<div class="grid">
 					<label>
 						Hours
-						<input type="number" name="hours" value="0" min="0"/>
+						<input type="number" name="scanner_hours" value="0" min="0"/>
 					</label>
 					<label>
 						Minutes
-						<input type="number" name="minutes" value="5" min="0" max="59"/>
+						<input type="number" name="scanner_minutes" value="5" min="0" max="59"/>
 					</label>
 					<label>
 						Seconds
-						<input type="number" name="seconds" value="0" min="0" max="59"/>
+						<input type="number" name="scanner_seconds" value="0" min="0" max="59"/>
 					</label>
 				</div>
 			</fieldset>
