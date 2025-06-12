@@ -18,4 +18,6 @@ func New(db *gorm.DB) server {
 func (s server) SetupRoutes(e *echo.Echo) {
 	e.GET("/subnet", s.subnetListPage())
 	e.GET("/api/v1/subnet", s.subnetListAPI())
+	e.GET("/subnet/delete/:id", s.subnetDeletePage())
+	e.DELETE("/api/v1/subnet/:id", s.subnetDeleteAPI())
 }

@@ -44,3 +44,35 @@ func (s server) subnetListPage() echo.HandlerFunc {
 		return components.SubnetListPage(subnets).Render(c.Request().Context(), c.Response().Writer)
 	}
 }
+
+func (s server) subnetDeleteAPI() echo.HandlerFunc {
+	type input struct {
+		ID uint `param:"id"`
+	}
+	return func(c echo.Context) error {
+		var i input
+		if err := c.Bind(&i); err != nil {
+			return echo.ErrBadRequest.SetInternal(err)
+		}
+		if err := s.subnetDelete(i.ID); err != nil {
+			return echo.ErrBadRequest.SetInternal(err)
+		}
+		return nil
+	}
+}
+
+func (s server) subnetDeletePage() echo.HandlerFunc {
+	type input struct {
+		ID uint `param:"id"`
+	}
+	return func(c echo.Context) error {
+		var i input
+		if err := c.Bind(&i); err != nil {
+			return echo.ErrBadRequest.SetInternal(err)
+		}
+		if err := s.subnetDelete(i.ID); err != nil {
+			return echo.ErrBadRequest.SetInternal(err)
+		}
+		return c.Redirect(http.StatusOK, "/subnet")
+	}
+}
