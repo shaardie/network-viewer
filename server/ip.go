@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/shaardie/network-viewer/components"
@@ -18,12 +19,33 @@ func (s server) ipList() ([]database.IP, error) {
 }
 
 func (s server) ipListAPI() echo.HandlerFunc {
+	type output struct {
+		ID       uint          `json:"id"`
+		IP       string        `json:"ip"`
+		RTT      time.Duration `json:"rtt"`
+		MAC      string        `json:"mac"`
+		Online   bool          `json:"online"`
+		Hostname string        `json:"hostname"`
+		Comment  string        `json:"comment"`
+	}
 	return func(c echo.Context) error {
 		ips, err := s.ipList()
 		if err != nil {
 			return echo.ErrInternalServerError.SetInternal(err)
 		}
-		return c.JSON(http.StatusOK, ips)
+		os := make([]output, 0, len(ips))
+		for _, i := range ips {
+			os = append(os, output{
+				ID:       i.ID,
+				IP:       i.IP,
+				RTT:      i.RTT,
+				MAC:      i.MAC,
+				Online:   i.Online,
+				Hostname: i.Hostname,
+				Comment:  i.Comment,
+			})
+		}
+		return c.JSON(http.StatusOK, os)
 	}
 }
 

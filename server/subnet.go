@@ -20,12 +20,31 @@ func (s server) subnetList() ([]database.Subnet, error) {
 }
 
 func (s server) subnetListAPI() echo.HandlerFunc {
+	type output struct {
+		ID              uint          `json:"id"`
+		Subnet          string        `json:"subnet"`
+		ScannerEnabled  bool          `json:"scanner_enabled"`
+		ScannerInterval time.Duration `json:"scanner_interval"`
+		LastScan        time.Time     `json:"last_scan"`
+		Comment         string        `json:"comment"`
+	}
 	return func(c echo.Context) error {
 		subnets, err := s.subnetList()
 		if err != nil {
 			return echo.ErrInternalServerError.SetInternal(err)
 		}
-		return c.JSON(http.StatusOK, subnets)
+		os := make([]output, 0, len(subnets))
+		for _, s := range subnets {
+			os = append(os, output{
+				ID:              s.ID,
+				Subnet:          s.Subnet.String(),
+				ScannerEnabled:  s.ScannerEnabled,
+				ScannerInterval: s.ScannerInterval,
+				LastScan:        s.LastScan,
+				Comment:         s.Comment,
+			})
+		}
+		return c.JSON(http.StatusOK, os)
 	}
 }
 
