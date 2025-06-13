@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/shaardie/network-viewer/components"
 	"github.com/shaardie/network-viewer/database"
 	"github.com/shaardie/network-viewer/server"
 	"github.com/shaardie/network-viewer/subnetscanner"
@@ -25,21 +24,6 @@ func main() {
 
 	s := server.New(db)
 	s.SetupRoutes(e)
-
-	e.GET("/", func(c echo.Context) error {
-		component := components.Home()
-		return component.Render(c.Request().Context(), c.Response().Writer)
-	})
-
-	// ip
-	e.GET("/ip", func(c echo.Context) error {
-		ips := []database.IP{}
-		if err := db.Find(&ips).Error; err != nil {
-			return echo.ErrInternalServerError.SetInternal(err)
-		}
-		component := components.IPListPage(ips)
-		return component.Render(c.Request().Context(), c.Response().Writer)
-	})
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
