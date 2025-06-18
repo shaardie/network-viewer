@@ -212,3 +212,41 @@ func (s server) subnetCreatePage() echo.HandlerFunc {
 		return c.Redirect(http.StatusSeeOther, "/subnet")
 	}
 }
+
+func (s server) subnetReplaceAPI() echo.HandlerFunc {
+	type input struct {
+		ID              uint          `param:"id"`
+		Subnet          string        `json:"subnet"`
+		ScannerEnabled  bool          `json:"scanner_enabled"`
+		ScannerInterval time.Duration `json:"scanner_interval"`
+		Comment         string        `json:"comment"`
+	}
+	return func(c echo.Context) error {
+		var i input
+		if err := c.Bind(&i); err != nil {
+			return echo.ErrBadRequest.SetInternal(fmt.Errorf("unable to bind, %w", err))
+		}
+		_, ipNet, err := net.ParseCIDR(i.Subnet)
+		if err != nil {
+			return echo.ErrBadRequest.SetInternal(fmt.Errorf("unable to parse cidr, %w", err))
+		}
+		subnet := database.Subnet{
+			Model: gorm.Model{
+				ID: i.ID,
+			},
+			Metadata: database.Metadata{
+				Comment: i.Comment,
+			},
+			ScannerInterval: i.ScannerInterval,
+			ScannerEnabled:  i.ScannerEnabled,
+			Subnet: database.IPNet{
+				IPNet: ipNet,
+			},
+		}
+		if err := s.db.Save(subnet).Error; err != nil {
+			return echo.ErrInternalServerError.SetInternal(fmt.Errorf("unable to save subnet, %w", err))
+		}
+
+		return c.JSON(http.StatusOK, subnet)
+	}
+}

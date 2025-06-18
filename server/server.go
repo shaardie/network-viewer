@@ -29,6 +29,7 @@ func (s server) SetupRoutes(e *echo.Echo) {
 	e.POST("/api/v1/subnet", s.subnetCreateAPI())
 	e.DELETE("/api/v1/subnet/:id", s.subnetDeleteAPI())
 	e.GET("/api/v1/subnet/:id", s.subnetGetAPI())
+	e.PUT("/api/v1/subnet/:id", s.subnetReplaceAPI())
 	e.GET("/api/v1/ip", s.ipListAPI())
 	e.DELETE("/api/v1/ip/:id", s.ipDeleteAPI())
 }

@@ -20,21 +20,25 @@ export function Form({ subnet }: { subnet?: Subnet }) {
     const durationNs = convertHMStoNs(hours, minutes, seconds);
 
     const payload = {
-      id: subnet?.id,
       subnet: form.get("subnet"),
       comment: form.get("comment"),
       scanner_enabled: form.get("scanner_enabled") === "true",
       scanner_interval: durationNs,
     };
 
-    if (subnet) {
-    } else {
-      const res = await fetch("/api/v1/subnet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    }
+    const res = subnet
+      ? await fetch(`/api/v1/subnet/${subnet.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+      : await fetch("/api/v1/subnet", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
 
     if (!res.ok) {
       const errText = await res.text();
@@ -75,7 +79,7 @@ export function Form({ subnet }: { subnet?: Subnet }) {
               type="checkbox"
               name="scanner_enabled"
               defaultValue="true"
-              defaultChecked={subnet?.scanner_enabled}
+              defaultChecked={subnet ? subnet.scanner_enabled : true}
             />
             Activate
           </label>
@@ -85,7 +89,7 @@ export function Form({ subnet }: { subnet?: Subnet }) {
               <input
                 type="number"
                 name="scanner_hours"
-                defaultValue={scanner_interval?.hours}
+                defaultValue={scanner_interval?.hours || 0}
                 min={0}
               />
             </label>
@@ -94,7 +98,7 @@ export function Form({ subnet }: { subnet?: Subnet }) {
               <input
                 type="number"
                 name="scanner_minutes"
-                defaultValue={scanner_interval?.minutes}
+                defaultValue={scanner_interval?.minutes || 5}
                 min={0}
                 max={59}
               />
@@ -104,16 +108,14 @@ export function Form({ subnet }: { subnet?: Subnet }) {
               <input
                 type="number"
                 name="scanner_seconds"
-                defaultValue={scanner_interval?.seconds}
+                defaultValue={scanner_interval?.seconds || 0}
                 min={0}
                 max={59}
               />
             </label>
           </div>
         </fieldset>
-        <button type="submit">
-          {subnet ? "Edit Subnet" : "Create Subnet"}
-        </button>
+        <button type="submit">{subnet ? "Save" : "Create"}</button>
       </form>
     </div>
   );
