@@ -1,17 +1,10 @@
 import { useEffect, useState } from "react";
 import { IPBase } from "./IPBase";
 
-type IPEntry = {
-  id: number;
-  ip: string;
-  hostname: string;
-  online: boolean;
-  rtt: number;
-  comment: string;
-};
+import { type IP } from "../../types/models";
 
 export function IPList() {
-  const [ips, setIPs] = useState<IPEntry[]>([]);
+  const [ips, setIPs] = useState<IP[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchIPs = () => {

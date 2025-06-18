@@ -9,7 +9,17 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/shaardie/network-viewer/components"
 	"github.com/shaardie/network-viewer/database"
+	"gorm.io/gorm"
 )
+
+type Subnet struct {
+	ID              uint          `json:"id"`
+	Subnet          string        `json:"subnet"`
+	ScannerEnabled  bool          `json:"scanner_enabled"`
+	ScannerInterval time.Duration `json:"scanner_interval"`
+	LastScan        time.Time     `json:"last_scan"`
+	Comment         string        `json:"comment"`
+}
 
 func (s server) subnetList() ([]database.Subnet, error) {
 	subnets := []database.Subnet{}
@@ -20,31 +30,52 @@ func (s server) subnetList() ([]database.Subnet, error) {
 }
 
 func (s server) subnetListAPI() echo.HandlerFunc {
-	type output struct {
-		ID              uint          `json:"id"`
-		Subnet          string        `json:"subnet"`
-		ScannerEnabled  bool          `json:"scanner_enabled"`
-		ScannerInterval time.Duration `json:"scanner_interval"`
-		LastScan        time.Time     `json:"last_scan"`
-		Comment         string        `json:"comment"`
-	}
 	return func(c echo.Context) error {
 		subnets, err := s.subnetList()
 		if err != nil {
 			return echo.ErrInternalServerError.SetInternal(err)
 		}
-		os := make([]output, 0, len(subnets))
-		for _, s := range subnets {
-			os = append(os, output{
-				ID:              s.ID,
-				Subnet:          s.Subnet.String(),
-				ScannerEnabled:  s.ScannerEnabled,
-				ScannerInterval: s.ScannerInterval,
-				LastScan:        s.LastScan,
-				Comment:         s.Comment,
+		os := make([]Subnet, 0, len(subnets))
+		for _, sn := range subnets {
+			os = append(os, Subnet{
+				ID:              sn.ID,
+				Subnet:          sn.Subnet.String(),
+				ScannerEnabled:  sn.ScannerEnabled,
+				ScannerInterval: sn.ScannerInterval,
+				LastScan:        sn.LastScan,
+				Comment:         sn.Comment,
 			})
 		}
 		return c.JSON(http.StatusOK, os)
+	}
+}
+
+func (s server) subnetGetAPI() echo.HandlerFunc {
+	type input struct {
+		ID uint `param:"id"`
+	}
+	return func(c echo.Context) error {
+		var i input
+		if err := c.Bind(&i); err != nil {
+			return echo.ErrBadRequest.SetInternal(err)
+		}
+		sn := database.Subnet{
+			Model: gorm.Model{
+				ID: i.ID,
+			},
+		}
+		if err := s.db.First(&sn).Error; err != nil {
+			return echo.ErrBadRequest.SetInternal(err)
+		}
+		o := Subnet{
+			ID:              sn.ID,
+			Subnet:          sn.Subnet.String(),
+			ScannerEnabled:  sn.ScannerEnabled,
+			ScannerInterval: sn.ScannerInterval,
+			LastScan:        sn.LastScan,
+			Comment:         sn.Comment,
+		}
+		return c.JSON(http.StatusOK, o)
 	}
 }
 

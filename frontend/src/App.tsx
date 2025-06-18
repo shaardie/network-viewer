@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
-import { SubnetList } from "./pages/subnet/SubnetList";
-import { SubnetCreate } from "./pages/subnet/SubnetCreate";
+import { List } from "./pages/subnet/List";
 import { IPList } from "./pages/ip/IPList";
+import { Show } from "./pages/subnet/Show";
+import { Create } from "./pages/subnet/Create";
+import { Edit } from "./pages/subnet/Edit";
 
 function App() {
   return (
@@ -11,8 +13,10 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/subnet" element={<SubnetList />} />
-          <Route path="/subnet/create" element={<SubnetCreate />} />
+          <Route path="/subnet" element={<List />} />
+          <Route path="/subnet/:id" element={<Show />} />
+          <Route path="/subnet/create" element={<Create />} />
+          <Route path="/subnet/edit/:id" element={<Edit />} />
           <Route path="/ip" element={<IPList />} />
         </Routes>
       </Layout>

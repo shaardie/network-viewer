@@ -1,8 +1,13 @@
 import { useState } from "react";
-import { SubnetBase } from "./SubnetBase";
+import { type Subnet } from "../../types/models";
+import { convertNsToHMS, convertHMStoNs } from "../../lib/lib";
 
-export function SubnetCreate() {
+export function Form({ subnet }: { subnet?: Subnet }) {
   const [error, setError] = useState<string | null>(null);
+
+  const scanner_interval = subnet?.scanner_interval
+    ? convertNsToHMS(subnet.scanner_interval)
+    : undefined;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -12,21 +17,24 @@ export function SubnetCreate() {
     const minutes = Number(form.get("scanner_minutes") || 0);
     const seconds = Number(form.get("scanner_seconds") || 0);
 
-    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    const durationNs = totalSeconds * 1_000_000_000; // Go erwartet int64 ns
+    const durationNs = convertHMStoNs(hours, minutes, seconds);
 
     const payload = {
+      id: subnet?.id,
       subnet: form.get("subnet"),
       comment: form.get("comment"),
       scanner_enabled: form.get("scanner_enabled") === "true",
       scanner_interval: durationNs,
     };
 
-    const res = await fetch("/api/v1/subnet", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    if (subnet) {
+    } else {
+      const res = await fetch("/api/v1/subnet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    }
 
     if (!res.ok) {
       const errText = await res.text();
@@ -36,7 +44,7 @@ export function SubnetCreate() {
     }
   };
   return (
-    <SubnetBase>
+    <div className="container">
       {error && <strong style={{ color: "red" }}>{error}</strong>}
       <form onSubmit={handleSubmit}>
         <fieldset>
@@ -45,13 +53,19 @@ export function SubnetCreate() {
             <input
               type="text"
               name="subnet"
+              defaultValue={subnet?.subnet}
               placeholder="192.168.0.0/24"
               required
             />
           </label>
           <label>
             Comment
-            <input type="text" name="comment" placeholder="Comment" />
+            <input
+              type="text"
+              name="comment"
+              defaultValue={subnet?.comment}
+              placeholder="Comment"
+            />
           </label>
         </fieldset>
         <fieldset>
@@ -60,8 +74,8 @@ export function SubnetCreate() {
             <input
               type="checkbox"
               name="scanner_enabled"
-              value="true"
-              defaultChecked
+              defaultValue="true"
+              defaultChecked={subnet?.scanner_enabled}
             />
             Activate
           </label>
@@ -71,7 +85,7 @@ export function SubnetCreate() {
               <input
                 type="number"
                 name="scanner_hours"
-                defaultValue={0}
+                defaultValue={scanner_interval?.hours}
                 min={0}
               />
             </label>
@@ -80,7 +94,7 @@ export function SubnetCreate() {
               <input
                 type="number"
                 name="scanner_minutes"
-                defaultValue={5}
+                defaultValue={scanner_interval?.minutes}
                 min={0}
                 max={59}
               />
@@ -90,15 +104,17 @@ export function SubnetCreate() {
               <input
                 type="number"
                 name="scanner_seconds"
-                defaultValue={0}
+                defaultValue={scanner_interval?.seconds}
                 min={0}
                 max={59}
               />
             </label>
           </div>
         </fieldset>
-        <button type="submit">Create Subnet</button>
+        <button type="submit">
+          {subnet ? "Edit Subnet" : "Create Subnet"}
+        </button>
       </form>
-    </SubnetBase>
+    </div>
   );
 }
