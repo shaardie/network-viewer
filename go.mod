@@ -3,7 +3,6 @@ module github.com/shaardie/network-viewer
 go 1.24.3
 
 require (
-	github.com/a-h/templ v0.3.898
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/prometheus-community/pro-bing v0.7.0
 	gorm.io/driver/sqlite v1.6.0
