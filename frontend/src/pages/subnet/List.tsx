@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { type Subnet } from "../../types/models.ts";
-import { formatDurationNs } from "../../lib/lib.ts";
+import { formatDurationNs, formatDateTime } from "../../lib/lib.ts";
 
 import { Operations } from "../../components/subnet/Operations.tsx";
 
@@ -62,7 +62,7 @@ export function List() {
                   <td>{s.subnet}</td>
                   <td>{s.scanner_enabled ? "✅" : "❌"}</td>
                   <td>{formatDurationNs(s.scanner_interval)}</td>
-                  <td>{s.last_scan}</td>
+                  <td>{formatDateTime(s.last_scan)}</td>
                   <td>{s.comment}</td>
                   <td>
                     <Operations subnet={s}></Operations>

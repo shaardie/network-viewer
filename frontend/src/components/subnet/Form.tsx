@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { type Subnet } from "../../types/models";
 import { convertNsToHMS, convertHMStoNs } from "../../lib/lib";
+import { useNavigate } from "react-router-dom";
 
 export function Form({ subnet }: { subnet?: Subnet }) {
   const [error, setError] = useState<string | null>(null);
+
+  const navigator = useNavigate();
 
   const scanner_interval = subnet?.scanner_interval
     ? convertNsToHMS(subnet.scanner_interval)
@@ -12,7 +15,6 @@ export function Form({ subnet }: { subnet?: Subnet }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-
     const hours = Number(form.get("scanner_hours") || 0);
     const minutes = Number(form.get("scanner_minutes") || 0);
     const seconds = Number(form.get("scanner_seconds") || 0);
@@ -40,11 +42,12 @@ export function Form({ subnet }: { subnet?: Subnet }) {
           body: JSON.stringify(payload),
         });
 
-    if (!res.ok) {
+    if (res.ok) {
+      const newSubnet = await res.json();
+      navigator(`/subnet/${newSubnet.ID}`);
+    } else {
       const errText = await res.text();
       setError(errText);
-    } else {
-      window.location.href = "/subnet";
     }
   };
   return (
