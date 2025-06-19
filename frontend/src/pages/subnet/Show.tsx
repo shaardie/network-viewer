@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { formatDurationNs, formatDateTime } from "../../lib/lib.ts";
 import { type Subnet } from "../../types/models.ts";
-import { Operations } from "../../components/subnet/Operations.tsx";
+import { Operations } from "../../components/Operations.tsx";
 
 export function Show() {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +26,7 @@ export function Show() {
     <>
       <h1>Subnet: {subnet.subnet}</h1>
       <div className="grid">
-        <Operations subnet={subnet}></Operations>
+        <Operations id={subnet.id} type="subnet"></Operations>
       </div>
       <table>
         <tbody>

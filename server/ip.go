@@ -36,7 +36,7 @@ func (s server) ipListAPI() echo.HandlerFunc {
 		for _, i := range ips {
 			os = append(os, output{
 				ID:       i.ID,
-				IP:       i.IP,
+				IP:       i.IP.String(),
 				RTT:      i.RTT,
 				MAC:      i.MAC,
 				Online:   i.Online,
@@ -48,10 +48,6 @@ func (s server) ipListAPI() echo.HandlerFunc {
 	}
 }
 
-func (s server) ipDelete(id uint) error {
-	return s.db.Delete(&database.IP{}, id).Error
-}
-
 func (s server) ipDeleteAPI() echo.HandlerFunc {
 	type input struct {
 		ID uint `param:"id"`
@@ -61,7 +57,7 @@ func (s server) ipDeleteAPI() echo.HandlerFunc {
 		if err := c.Bind(&i); err != nil {
 			return echo.ErrBadRequest.SetInternal(err)
 		}
-		if err := s.ipDelete(i.ID); err != nil {
+		if err := s.db.Delete(&database.IP{}, i.ID).Error; err != nil {
 			return echo.ErrBadRequest.SetInternal(err)
 		}
 		return nil

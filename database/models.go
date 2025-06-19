@@ -17,23 +17,6 @@ const (
 	SubnetTypeIPv6 subnetType = "ipv6"
 )
 
-type Metadata struct {
-	Comment string
-}
-
-type Subnet struct {
-	gorm.Model
-	Metadata
-
-	Subnet IPNet `gorm:"unique,not null"`
-
-	ScannerInterval time.Duration
-	ScannerEnabled  bool
-	LastScan        time.Time
-
-	IPs []IP
-}
-
 type IPNet struct {
 	*net.IPNet
 }
@@ -55,15 +38,30 @@ func (ipNet IPNet) Value() (driver.Value, error) {
 	return ipNet.String(), nil
 }
 
+type Subnet struct {
+	gorm.Model
+
+	Subnet IPNet
+
+	ScannerInterval time.Duration
+	ScannerEnabled  bool
+	LastScan        time.Time
+
+	IPs []IP
+
+	Comment string
+}
+
 type IP struct {
 	gorm.Model
-	Metadata
 
-	IP       string `gorm:"unique,not null"`
+	IP       IPNet
 	RTT      time.Duration
 	MAC      string
 	Online   bool
 	Hostname string
 
 	SubnetID uint
+
+	Comment string
 }

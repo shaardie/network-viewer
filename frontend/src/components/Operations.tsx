@@ -1,15 +1,24 @@
-import { type Subnet } from "../../types/models";
 import { useNavigate } from "react-router-dom";
 
-export function Operations({ subnet }: { subnet: Subnet }) {
+export function Operations({
+  id,
+  type,
+  onDelete,
+}: {
+  id: number;
+  type: string;
+  onDelete?: () => void;
+}) {
   const navigate = useNavigate();
   const handleDelete = async () => {
-    const res = await fetch(`/api/v1/subnet/${subnet.id}`, {
+    const res = await fetch(`/api/v1/${type}/${id}`, {
       method: "DELETE",
     });
 
     if (res.ok) {
-      navigate("/subnet");
+      if (onDelete) {
+        onDelete();
+      }
     } else {
       alert("deletion failed");
     }
@@ -17,9 +26,7 @@ export function Operations({ subnet }: { subnet: Subnet }) {
 
   return (
     <>
-      <button onClick={() => navigate(`/subnet/edit/${subnet.id}`)}>
-        Edit
-      </button>
+      <button onClick={() => navigate(`/${type}/edit/${id}`)}>Edit</button>
       <button onClick={handleDelete}>Delete</button>
     </>
   );

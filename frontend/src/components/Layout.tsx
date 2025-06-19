@@ -7,7 +7,17 @@ export function Layout({ children }: { children: ReactNode }) {
         <nav>
           <ul>
             <li>
-              <strong>Network Viewer</strong>
+              <strong>
+                <a
+                  href="/"
+                  style={{
+                    all: "unset",
+                    cursor: "pointer",
+                  }}
+                >
+                  Network Viewer
+                </a>
+              </strong>
             </li>
           </ul>
           <ul>

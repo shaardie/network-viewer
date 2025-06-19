@@ -52,12 +52,18 @@ func (s SubnetScanner) worker(ctx context.Context, id int, subnet *database.Subn
 
 		ip := database.IP{}
 		found := true
-		if err := s.db.Where(&database.IP{IP: ipWithMask.String()}).Find(&ip); err != nil {
+		if err := s.db.Where(
+			&database.IP{
+				IP: database.IPNet{
+					IPNet: &ipWithMask,
+				},
+			},
+		).Find(&ip); err != nil {
 			found = false
 		}
 
 		ip.SubnetID = subnet.ID
-		ip.IP = ipWithMask.String()
+		ip.IP = database.IPNet{IPNet: &ipWithMask}
 
 		pinger, err := probing.NewPinger(ipWithMask.IP.String())
 		if err != nil {

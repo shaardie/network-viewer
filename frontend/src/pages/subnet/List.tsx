@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { type Subnet } from "../../types/models.ts";
 import { formatDurationNs, formatDateTime } from "../../lib/lib.ts";
 
-import { Operations } from "../../components/subnet/Operations.tsx";
+import { Operations } from "../../components/Operations.tsx";
 
 export function List() {
   const [subnets, setSubnets] = useState<Subnet[]>([]);
@@ -54,18 +54,21 @@ export function List() {
             </thead>
             <tbody>
               {subnets.map((s) => (
-                <tr
-                  key={s.id}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/subnet/${s.id}`)}
-                >
+                <tr>
                   <td>{s.subnet}</td>
                   <td>{s.scanner_enabled ? "✅" : "❌"}</td>
                   <td>{formatDurationNs(s.scanner_interval)}</td>
                   <td>{formatDateTime(s.last_scan)}</td>
                   <td>{s.comment}</td>
                   <td>
-                    <Operations subnet={s}></Operations>
+                    <button onClick={() => navigate(`/subnet/${s.id}`)}>
+                      Details
+                    </button>
+                    <Operations
+                      id={s.id}
+                      type="subnet"
+                      onDelete={fetchSubnets}
+                    ></Operations>
                   </td>
                 </tr>
               ))}

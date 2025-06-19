@@ -119,14 +119,12 @@ func (s server) subnetCreateAPI() echo.HandlerFunc {
 			return echo.ErrBadRequest.SetInternal(err)
 		}
 		subnet := database.Subnet{
-			Metadata: database.Metadata{
-				Comment: i.Comment,
-			},
 			ScannerInterval: i.ScannerInterval,
 			ScannerEnabled:  i.ScannerEnabled,
 			Subnet: database.IPNet{
 				IPNet: ipNet,
 			},
+			Comment: i.Comment,
 		}
 		err = s.subnetCreate(&subnet)
 		if err != nil {
@@ -158,14 +156,12 @@ func (s server) subnetReplaceAPI() echo.HandlerFunc {
 			Model: gorm.Model{
 				ID: i.ID,
 			},
-			Metadata: database.Metadata{
-				Comment: i.Comment,
-			},
 			ScannerInterval: i.ScannerInterval,
 			ScannerEnabled:  i.ScannerEnabled,
 			Subnet: database.IPNet{
 				IPNet: ipNet,
 			},
+			Comment: i.Comment,
 		}
 		if err := s.db.Save(subnet).Error; err != nil {
 			return echo.ErrInternalServerError.SetInternal(fmt.Errorf("unable to save subnet, %w", err))
