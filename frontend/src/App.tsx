@@ -7,7 +7,7 @@ import { Show } from "./pages/subnet/Show";
 import { Create } from "./pages/subnet/Create";
 import { Edit } from "./pages/subnet/Edit";
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Layout>
@@ -23,5 +23,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;
